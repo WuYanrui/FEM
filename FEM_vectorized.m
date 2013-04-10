@@ -26,6 +26,11 @@ R = zeros(length(theta),length(e_slab));
 eta = zeros(length(theta),length(e_slab)+1);
 eta(:,end) = sqrt(mu0/eps0);
 R(:,1) = -1;
+
+
+
+
+
 eta = (mu_slab*kx(:,[2:end]) - mu_slab*kx(:,[1:end-1]))...
     ./(mu_slab*kx(:,[2:end]) + mu_slab*kx(:,[1:end-1]));
 for i = 2:length(e_slab)+1

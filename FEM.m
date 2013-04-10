@@ -16,51 +16,36 @@ mu_slab = mu0*mur_slab;
 kx = zeros(length(theta),length(e_slab));
 for i = 1:length(theta)
     for j = 1:length(e_slab)
-        kx(i,j) = k0*sqrt(mu_slab*e_slab(j) - sin(theta(i))^2);
+            kx(i,j) = k0*sqrt(mu_slab*e_slab(j) - sin(theta(i))^2);        
     end
 end
 % kx = k0*sqrt(mu_slab*e_slab - sin(theta).^2);
 %% FEM
-eta = zeros(1,m+1);
 R = zeros(length(theta),length(e_slab));
-eta = zeros(length(theta),length(e_slab)+1);
-eta(:,end) = sqrt(mu0/eps0);
+eta = zeros(length(theta),length(e_slab));
 R(:,1) = -1;
-eta = (mu_slab*kx(:,[2:end]) - mu_slab*kx(:,[1:end-1]))...
-    ./(mu_slab*kx(:,[2:end]) + mu_slab*kx(:,[1:end-1]));
-for i = 2:length(e_slab)+1
-   R(:,i) = exp(2*1j*kx(:,i)*x(i)).*(eta(:,i) + R(:,i-1).*exp(-2*1j*kx(:,i-1).*x(i)))...
-       ./(1 + eta(:,i).*R(:,i-1).*exp(-2*1j*kx(:,i-1).*x(i)));
+
+for i = 1:length(theta)
+    for j = 2:length(e_slab)
+        eta(i,j) = (mu_slab*kx(i,j) - mu_slab*kx(i,j-1))...
+            /(mu_slab*kx(i,j) + mu_slab*kx(i,j-1));       
+    end
 end
-
-
-
-
-
-
-
-
-
-
-% for i = 2:m+1
-%     if i == m+1
-%         eta(i) = sqrt(mu0/eps0);
-%     else
-%         eta(i) = (mu_slab*kx(i) - mu_slab*kx(i-1))/(mu_slab*kx(i)...
-%             + mu_slab*kx(i-1));
-%     end
-%         R(i) = exp(2*1j*kx(i)*x(i))*((eta(i) + R(i-1)*exp(-2*1j*kx(i-1)*x(i)))...
-%             /(1+(eta(i)*R(i-1)*exp(-2*1j*kx(i-1)*x(i)))));
-% 
-% end
-
-% eta = mu_slab*kx - mu_slab*kx(2:end-1);
+for i = 1:length(theta)
+    for j = 2:length(e_slab)
+        
+           R(i,j) = exp(2*1j*kx(i,j)*x(j))*...
+            ((eta(i,j) + R(i,j-1)*exp(-2*1j*kx(i,j-1)*x(j)))...
+            /(1+(eta(i,j)*R(i,j-1)*exp(-2*1j*kx(i,j-1)*x(j)))));     
+        
+    end
+end
 
 subplot(1,2,1)
 plot(x/L,abs(e_slab)); title('Permitivity profile in slab');
 ylabel('permitivity');xlabel('distance from PEC (x/L)');
 subplot(1,2,2)
-plot(theta*180/pi,abs(R))
+plot(theta*180/pi,abs(R(:,end)))
 
 
 
