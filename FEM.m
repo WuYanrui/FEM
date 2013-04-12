@@ -10,7 +10,7 @@ L = 5*lamb0; % Length of slab is 5x free space wavelength
 x = 0:L/m:L; % discretize dielectric slab with N nodes
 y = 0:L/(m-1):L; % discretize dielectric slab with M elements
 theta = 0:pi/2/m:pi/2; % incident angle range from 0 to 90 degrees
-er_slab = 4 + (2-1i*0.1)*((1-y/L).^2);
+er_slab = 4 + (2-1i*0.1)*((1-(y/L)).^2);
 er_slab = padarray(er_slab, [0 1],1,'post'); % pad array with '1' for free space
 e_slab = eps0*er_slab;
 mur_slab = 2 - 1j*.1;
@@ -28,17 +28,17 @@ for i = 1:length(theta)
 end
 %% FEM
 R = zeros(length(theta),n);
-eta = zeros(length(theta),n);
+eta = zeros(length(theta),m);
 R(:,1) = -1;
 % Compute ETA_m 
 for i = 1:length(theta)
-    for j = 2:n
-        if j == length(e_slab)
-            eta(i,j) = (mu_slab*kx(i,j) - mu0*kx(i,j-1))...
-                /(mu_slab*kx(i,j) + mu0*kx(i,j-1));         
+    for j = 1:size(eta,2)
+        if j == size(eta,2)
+            eta(i,j) = (mu_slab*kx(i,j+1) - mu0*kx(i,j))...
+                /(mu_slab*kx(i,j+1) + mu0*kx(i,j));         
         else
-            eta(i,j) = (kx(i,j) - kx(i,j-1))...
-                /(kx(i,j) + kx(i,j-1));   
+            eta(i,j) = (kx(i,j+1) - kx(i,j))...
+                /(kx(i,j+1) + kx(i,j));   
         end
 %         eta(i,j) = (mu_slab*kx(i,j) - mu_slab*kx(i,j-1))...
 %             /(mu_slab*kx(i,j) + mu_slab*kx(i,j-1));       
@@ -46,11 +46,11 @@ for i = 1:length(theta)
 end
 % Compute R_m
 for i = 1:length(theta)
-    for j = 2:length(e_slab)
+    for j = 1:size(eta,2)
         
-           R(i,j) = exp(2*1j*kx(i,j)*x(j))*...
-            ((eta(i,j) + R(i,j-1)*exp(-2*1j*kx(i,j-1)*x(j)))...
-            /(1+(eta(i,j)*R(i,j-1)*exp(-2*1j*kx(i,j-1)*x(j)))));     
+           R(i,j+1) = exp(2*1j*kx(i,j+1)*x(j+1))*...
+            ((eta(i,j) + R(i,j)*exp(-2*1j*kx(i,j)*x(j+1)))...
+            /(1+(eta(i,j)*R(i,j)*exp(-2*1j*kx(i,j)*x(j+1)))));     
         
     end
 end
@@ -63,6 +63,7 @@ THETA = pi/4;
 b_e = -(k0^2)*(e_slab - a_e*sin(THETA)^2);
 for e = 1:m
     l_e = x(e+1)-x(e);
+    % Fill elemental K-matrix
     for i = 1:2
         for j = 1:2
             if i == j

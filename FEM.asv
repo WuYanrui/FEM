@@ -28,12 +28,12 @@ for i = 1:length(theta)
 end
 %% FEM
 R = zeros(length(theta),n);
-eta = zeros(length(theta),n);
+eta = zeros(length(theta),m);
 R(:,1) = -1;
 % Compute ETA_m 
 for i = 1:length(theta)
-    for j = 2:n
-        if j == length(e_slab)
+    for j = 2:size(eta,2)
+        if j == size(eta,2)
             eta(i,j) = (mu_slab*kx(i,j) - mu0*kx(i,j-1))...
                 /(mu_slab*kx(i,j) + mu0*kx(i,j-1));         
         else
@@ -46,11 +46,11 @@ for i = 1:length(theta)
 end
 % Compute R_m
 for i = 1:length(theta)
-    for j = 2:length(e_slab)
+    for j = 1:size(eta,2)
         
-           R(i,j) = exp(2*1j*kx(i,j)*x(j))*...
-            ((eta(i,j) + R(i,j-1)*exp(-2*1j*kx(i,j-1)*x(j)))...
-            /(1+(eta(i,j)*R(i,j-1)*exp(-2*1j*kx(i,j-1)*x(j)))));     
+           R(i,j+1) = exp(2*1j*kx(i,j+1)*x(j+1))*...
+            ((eta(i,j) + R(i,j)*exp(-2*1j*kx(i,j)*x(j+1)))...
+            /(1+(eta(i,j)*R(i,j)*exp(-2*1j*kx(i,j)*x(j+1)))));     
         
     end
 end
@@ -61,8 +61,9 @@ K = zeros(n,n); % This is a K-matrix for a SPECIFIED incidence angle
 a_e = 1/mu_slab;
 THETA = pi/4;
 b_e = -(k0^2)*(e_slab - a_e*sin(THETA)^2);
-for e = 1:n
+for e = 1:m
     l_e = x(e+1)-x(e);
+    % Fill elemental K-matrix
     for i = 1:2
         for j = 1:2
             if i == j
@@ -71,20 +72,17 @@ for e = 1:n
                 K_e(i,j) = -a_e/l_e + b_e(e)*l_e/6;
             end
         end
-    
+              
     end
+
+    % fill general K-matrix
+    K(e,e) = K(e,e)+ K_e(1,1);
+    K(e+1,e) = K(e+1,e)+ K_e(2,1);
+    K(e,e+1) = K(e,e+1)+ K_e(1,2);
+    K(e+1,e+1) = K(e+1,e+1)+ K_e(2,2);
     
     
 end
-
-
-
-
-
-
-
-
-
 
 subplot(1,2,1)
 plot(padarray(y,[0 1],L+L/m,'post')/L,abs(e_slab)); title('Permitivity profile in slab');
