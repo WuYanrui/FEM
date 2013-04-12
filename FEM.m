@@ -4,7 +4,7 @@ clc;clear;
 %% set up constants from constants.m
 constants
 %% Set up geometry
-m = 50; % Number of elements
+m = 100; % Number of elements
 n = m+1; % Number of nodes
 L = 5*lamb0; % Length of slab is 5x free space wavelength
 x = 0:L/m:L; % discretize dielectric slab with N nodes
@@ -20,9 +20,9 @@ kx = zeros(length(theta),length(e_slab));
 for i = 1:length(theta)
     for j = 1:length(e_slab)
         if j == length(e_slab)
-            kx(i,j) = k0*sqrt(mu0*e_slab(j) - sin(theta(i))^2);        
+            kx(i,j) = k0*sqrt(1 - sin(theta(i))^2);        
         else
-            kx(i,j) = k0*sqrt(mu_slab*e_slab(j) - sin(theta(i))^2);
+            kx(i,j) = k0*sqrt(mur_slab*er_slab(j) - sin(theta(i))^2);
         end
     end
 end
@@ -34,8 +34,8 @@ R(:,1) = -1;
 for i = 1:length(theta)
     for j = 1:size(eta,2)
         if j == size(eta,2)
-            eta(i,j) = (mu_slab*kx(i,j+1) - mu0*kx(i,j))...
-                /(mu_slab*kx(i,j+1) + mu0*kx(i,j));         
+            eta(i,j) = (mur_slab*kx(i,j+1) - kx(i,j))...
+                /(mur_slab*kx(i,j+1) + kx(i,j));         
         else
             eta(i,j) = (kx(i,j+1) - kx(i,j))...
                 /(kx(i,j+1) + kx(i,j));   
@@ -58,9 +58,9 @@ end
 %% Formation of the elemental K-matrix
 K_e = zeros(2,2);
 K = zeros(n,n); % This is a K-matrix for a SPECIFIED incidence angle
-alpha_e = 1/mu_slab;
+alpha_e = 1/mur_slab;
 THETA = pi/4;
-beta_e = -(k0^2)*(e_slab - alpha_e*sin(THETA)^2);
+beta_e = -(k0^2)*(er_slab - alpha_e*sin(THETA)^2);
 b_e = zeros(1,n);
 E0 = 1;
 b_e(end) = 2*1j*k0*cos(THETA)*E0*exp(1j*k0*L*cos(THETA));
