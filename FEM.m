@@ -58,18 +58,21 @@ end
 %% Formation of the elemental K-matrix
 K_e = zeros(2,2);
 K = zeros(n,n); % This is a K-matrix for a SPECIFIED incidence angle
-a_e = 1/mu_slab;
+alpha_e = 1/mu_slab;
 THETA = pi/4;
-b_e = -(k0^2)*(e_slab - a_e*sin(THETA)^2);
+beta_e = -(k0^2)*(e_slab - alpha_e*sin(THETA)^2);
+b_e = zeros(1,n);
+E0 = 1;
+b_e(end) = 2*1j*k0*cos(THETA)*E0*exp(1j*k0*L*cos(THETA));
 for e = 1:m
     l_e = x(e+1)-x(e);
     % Fill elemental K-matrix
     for i = 1:2
         for j = 1:2
             if i == j
-                K_e(i,j) = a_e/l_e + b_e(e)*l_e/3;
+                K_e(i,j) = alpha_e/l_e + beta_e(e)*l_e/3;
             else
-                K_e(i,j) = -a_e/l_e + b_e(e)*l_e/6;
+                K_e(i,j) = -alpha_e/l_e + beta_e(e)*l_e/6;
             end
         end
               
