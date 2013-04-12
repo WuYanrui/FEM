@@ -55,6 +55,34 @@ for i = 1:length(theta)
     end
 end
 
+%% Formation of the elemental K-matrix
+K_e = zeros(2,2);
+K = zeros(n,n); % This is a K-matrix for a SPECIFIED incidence angle
+a_e = 1/mu_slab;
+THETA = pi/4;
+b_e = -(k0^2)*(e_slab - a_e*sin(THETA)^2);
+for e = 1:m
+    l_e = x(e+1)-x(e);
+    for i = 1:2
+        for j = 1:2
+            if i == j
+                K_e(i,j) = a_e/l_e + b_e(e)*l_e/3;
+            else
+                K_e(i,j) = -a_e/l_e + b_e(e)*l_e/6;
+            end
+        end
+              
+    end
+
+    % fill general K-matrix
+    K(e,e) = K(e,e)+ K_e(1,1);
+    K(e+1,e) = K(e+1,e)+ K_e(2,1);
+    K(e,e+1) = K(e,e+1)+ K_e(1,2);
+    K(e+1,e+1) = K(e+1,e+1)+ K_e(2,2);
+    
+    
+end
+
 subplot(1,2,1)
 plot(padarray(y,[0 1],L+L/m,'post')/L,abs(e_slab)); title('Permitivity profile in slab');
 ylabel('permitivity');xlabel('distance from PEC (x/L)');
