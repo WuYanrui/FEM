@@ -1,7 +1,4 @@
 % example script
-%% Project #1
-% Authors: Adedayo Lawal and Blake Levy
-% constants.m
 %% Project #2
 % Authors: Blake Levy and Adedayo Lawal
 %% Set up Parameters

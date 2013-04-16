@@ -61,9 +61,7 @@ K = zeros(n,n); % This is a K-matrix for a SPECIFIED incidence angle
 alpha_e = 1/mur_slab;
 THETA = pi/4;
 beta_e = -(k0^2)*(er_slab - alpha_e*sin(THETA)^2);
-b_e = zeros(1,n);
 E0 = 1;
-b_e(end) = 2*1j*k0*cos(THETA)*E0*exp(1j*k0*L*cos(THETA));
 for e = 1:m
     l_e = x(e+1)-x(e);
     % Fill elemental K-matrix
@@ -86,6 +84,17 @@ for e = 1:m
     
     
 end
+
+%% Formation of the global b
+% form the global b vector
+b = zeros(n,1);
+% add the boundary conditions at L to the b vector and K matrix
+% respectively
+b(end) = 2*1j*k0*cos(THETA)*E0*exp(1j*k0*L*cos(THETA));
+K(end,end) = K(end,end)+ 1j*k0*cos(THETA);
+
+%% Plot Analytical solution
+
 
 subplot(1,2,1)
 plot(padarray(y,[0 1],L+L/m,'post')/L,abs(e_slab)); title('Permitivity profile in slab');
