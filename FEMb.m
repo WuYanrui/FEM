@@ -2,8 +2,10 @@
 % Authors: Blake Levy and Adedayo Lawal
 % Vectorized approach
 clc;clear;
+tic
 %% set up constants from constants.m
 constants
+
 %% Set up geometry
 M = 100; % Number of elements
 n = M+1; % Number of nodes
@@ -35,3 +37,4 @@ plot(phi*180/pi,abs(R(:,end)));
 xlabel('\theta (degrees)');
 ylabel('Reflection coefficient');
 legend({'Analytical'});
+display(toc)

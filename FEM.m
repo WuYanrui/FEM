@@ -1,6 +1,7 @@
 %% Project #2
 % Authors: Blake Levy and Adedayo Lawal
 clc;clear;
+tic
 %% set up constants from constants.m
 constants
 %% Set up geometry
@@ -58,23 +59,27 @@ end
 %% Formation of the elemental K-matrix
 K_e = zeros(2,2);
 K = zeros(n,n); % This is a K-matrix for a SPECIFIED incidence angle
+reflection = zeros(1,length(theta));
 alpha_e = 1/mur_slab;
-THETA = pi/4;
-beta_e = -(k0^2)*(er_slab - alpha_e*sin(THETA)^2);
+
 E0 = 1;
-for e = 1:m
+phi = zeros(length(theta),length(theta));
+for T = 1:length(theta)
+    THETA = theta(T);    
+    beta_e = -(k0^2)*(er_slab - alpha_e*sin(THETA)^2);    
+    for e = 1:m
     l_e = x(e+1)-x(e);
-    % Fill elemental K-matrix
-    for i = 1:2
-        for j = 1:2
-            if i == j
-                K_e(i,j) = alpha_e/l_e + beta_e(e)*l_e/3;
-            else
-                K_e(i,j) = -alpha_e/l_e + beta_e(e)*l_e/6;
+        % Fill elemental K-matrix
+        for i = 1:2
+            for j = 1:2
+                if i == j
+                    K_e(i,j) = alpha_e/l_e + beta_e(e)*l_e/3;
+                else
+                    K_e(i,j) = -alpha_e/l_e + beta_e(e)*l_e/6;
+                end
             end
+
         end
-              
-    end
 
     % fill general K-matrix
     K(e,e) = K(e,e)+ K_e(1,1);
@@ -83,25 +88,33 @@ for e = 1:m
     K(e+1,e+1) = K(e+1,e+1)+ K_e(2,2);
     
     
+    end
+    K(1,1) = 1;
+    K(1,[2 end]) = 0;
+    K([2 end], 1) = 0;
+    %% Formation of the global b
+    % form the global b vector
+    q = 2*1j*k0*cos(THETA)*E0*exp(1j*k0*L*cos(THETA));
+    gamma = 1j*k0*cos(THETA);
+    b = zeros(n,1);
+    % add the boundary conditions at L to the b vector and K matrix
+    % respectively
+    b(end) = q*(1 + l_e/2);
+    K(end,end) = K(end,end)+ gamma;
+    phi(T,:) = b\K;
+    E_inc = E0*exp(1j*k0*L*cos(THETA));
+    reflection(T) = (phi(T,end) - E_inc)/conj(E_inc);
 end
-
-%% Formation of the global b
-% form the global b vector
-b = zeros(n,1);
-% add the boundary conditions at L to the b vector and K matrix
-% respectively
-b(end) = 2*1j*k0*cos(THETA)*E0*exp(1j*k0*L*cos(THETA));
-K(end,end) = K(end,end)+ 1j*k0*cos(THETA);
-
 %% Plot Analytical solution
-
 
 subplot(1,2,1)
 plot(padarray(y,[0 1],L+L/m,'post')/L,abs(e_slab)); title('Permitivity profile in slab');
 ylabel('permitivity');xlabel('distance from PEC (x/L)');
 subplot(1,2,2)
 plot(theta*180/pi,abs(R(:,end)))
-
-
+display(toc)
+subplot(1,2,1)
+plot(theta*180/pi,abs(reflection))
+title('simulated')
 
 
