@@ -101,7 +101,7 @@ for T = 1:length(theta)
     % respectively
     b(end) = q*(1 + l_e/2);
     K(end,end) = K(end,end)+ gamma;
-    phi(T,:) = b\K;
+    phi(T,:) = K\b;
     E_inc = E0*exp(1j*k0*L*cos(THETA));
     reflection(T) = (phi(T,end) - E_inc)/conj(E_inc);
 end
