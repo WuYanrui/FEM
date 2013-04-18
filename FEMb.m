@@ -37,4 +37,4 @@ plot(phi*180/pi,abs(R(:,end)));
 xlabel('\theta (degrees)');
 ylabel('Reflection coefficient');
 legend({'Analytical'});
-display(toc)
+toc

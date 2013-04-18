@@ -105,16 +105,15 @@ for T = 1:length(theta)
     E_inc = E0*exp(1j*k0*L*cos(THETA));
     reflection(T) = (phi(T,end) - E_inc)/conj(E_inc);
 end
-%% Plot Analytical solution
+% Plot Analytical solution
 
 subplot(1,2,1)
 plot(padarray(y,[0 1],L+L/m,'post')/L,abs(e_slab)); title('Permitivity profile in slab');
 ylabel('permitivity');xlabel('distance from PEC (x/L)');
 subplot(1,2,2)
 plot(theta*180/pi,abs(R(:,end)))
-display(toc)
 subplot(1,2,1)
 plot(theta*180/pi,abs(reflection))
 title('simulated')
-
+toc
 
