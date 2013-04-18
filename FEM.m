@@ -89,9 +89,9 @@ for T = 1:length(theta)
     
     
     end
-    K(1,1) = 1;
-    K(1,[2 end]) = 0;
-    K([2 end], 1) = 0;
+%     K(1,1) = 1;
+%     K(1,[2 end]) = 0;
+%     K([2 end], 1) = 0;
     %% Formation of the global b
     % form the global b vector
     q = 2*1j*k0*cos(THETA)*E0*exp(1j*k0*L*cos(THETA));
@@ -99,7 +99,7 @@ for T = 1:length(theta)
     b = zeros(n,1);
     % add the boundary conditions at L to the b vector and K matrix
     % respectively
-    b(end) = q*(1 + l_e/2);
+    b(end) = q;
     K(end,end) = K(end,end)+ gamma;
     phi(T,:) = K\b;
     E_inc = E0*exp(1j*k0*L*cos(THETA));

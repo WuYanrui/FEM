@@ -59,6 +59,10 @@ for k = 1:numel(phi)
         b(i) = f(i-1)*l/2 + f(i)*l/2;
     end
     % apply boundary conditions
+    K(1,1) = 1;
+    K(1,2:end) = 0;
+    K(2:end,1) = 0;
+    
     E0 = 1; % 1V/m
     q = 2*1j*k0*cos(THETA)*E0*exp(1j*k0*L*cos(THETA));
     gamma = 1j*k0*cos(THETA);
@@ -80,4 +84,10 @@ plot(phi*180/pi,abs(reflection))
 xlabel('\theta (degrees)');
 ylabel('Reflection coefficient');
 legend({'Numerical'});
+figure
+plot(phi*180/pi,abs(R(:,end)),'-',phi*180/pi,abs(reflection),'--')
+xlabel('\theta (degrees)');
+ylabel('Reflection coefficient');
+s = sprintf('FEM, %d cells',M);
+legend({'Analytical',s});
 toc
