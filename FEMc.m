@@ -47,7 +47,7 @@ for k = 1:numel(phi)
     K(1,1) = alpha(1)/l + beta(1)*l/3;
     K(N,N) = alpha(M)/l + beta(M)*l/3;
     for i = 2:N-1
-        K(i,i) = alpha(i-1)/l + beta(i-1)/3 + alpha(i)/l + beta(i)*l/3;
+        K(i,i) = alpha(i-1)/l + beta(i-1)*l/3 + alpha(i)/l + beta(i)*l/3;
         K(i+1,i) = -alpha(i)/l + beta(i)*l/6;
         K(i,i+1) = K(i+1,i);
     end

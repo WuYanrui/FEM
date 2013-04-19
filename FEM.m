@@ -83,15 +83,16 @@ for T = 1:length(theta)
 
     % fill general K-matrix
     K(e,e) = K(e,e)+ K_e(1,1);
+    K(e+1,e+1) = K(e+1,e+1)+ K_e(2,2);    
     K(e+1,e) = K(e+1,e)+ K_e(2,1);
     K(e,e+1) = K(e,e+1)+ K_e(1,2);
-    K(e+1,e+1) = K(e+1,e+1)+ K_e(2,2);
+
     
     
     end
-%     K(1,1) = 1;
-%     K(1,[2 end]) = 0;
-%     K([2 end], 1) = 0;
+    K(1,1) = 1;
+    K(1,[2 end]) = 0;
+    K([2 end], 1) = 0;
     %% Formation of the global b
     % form the global b vector
     q = 2*1j*k0*cos(THETA)*E0*exp(1j*k0*L*cos(THETA));
