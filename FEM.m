@@ -5,12 +5,12 @@ tic
 %% set up constants from constants.m
 constants
 %% Set up geometry
-m = 100; % Number of elements
+m = 1000; % Number of elements
 n = m+1; % Number of nodes
 L = 5*lamb0; % Length of slab is 5x free space wavelength
 x = 0:L/m:L; % discretize dielectric slab with N nodes
 y = 0:L/(m-1):L; % discretize dielectric slab with M elements
-theta = 0:pi/2/m:pi/2; % incident angle range from 0 to 90 degrees
+theta = 0:pi/(2*m):pi/2; % incident angle range from 0 to 90 degrees
 er_slab = 4 + (2-1i*0.1)*((1-(y/L)).^2);
 er_slab = padarray(er_slab, [0 1],1,'post'); % pad array with '1' for free space
 e_slab = eps0*er_slab;
@@ -56,15 +56,16 @@ for i = 1:length(theta)
     end
 end
 
-%% Formation of the elemental K-matrix
-K_e = zeros(2,2);
-K = zeros(n,n); % This is a K-matrix for a SPECIFIED incidence angle
+
 reflection = zeros(1,length(theta));
 alpha_e = 1/mur_slab;
 
 E0 = 1;
 phi = zeros(length(theta),length(theta));
 for T = 1:length(theta)
+    %% Formation of the elemental K-matrix
+    K_e = zeros(2,2);
+    K = zeros(n,n); % This is a K-matrix for a SPECIFIED incidence angle    
     THETA = theta(T);    
     beta_e = -(k0^2)*(er_slab - alpha_e*sin(THETA)^2);    
     for e = 1:m
@@ -108,13 +109,14 @@ for T = 1:length(theta)
 end
 % Plot Analytical solution
 
-subplot(1,2,1)
-plot(padarray(y,[0 1],L+L/m,'post')/L,abs(e_slab)); title('Permitivity profile in slab');
-ylabel('permitivity');xlabel('distance from PEC (x/L)');
-subplot(1,2,2)
-plot(theta*180/pi,abs(R(:,end)))
-subplot(1,2,1)
-plot(theta*180/pi,abs(reflection))
-title('simulated')
+% subplot(1,2,1)
+% plot(padarray(y,[0 1],L+L/m,'post')/L,abs(e_slab)); title('Permitivity profile in slab');
+% ylabel('permitivity');xlabel('distance from PEC (x/L)');
+% subplot(1,2,2)
+figure(1)
+plot(theta*180/pi,abs(R(:,end)),'k',theta*180/pi,abs(reflection),'k--')
+% subplot(1,2,1)
+% plot(theta*180/pi,abs(reflection))
+legend('Analytical','simulated')
 toc
 
