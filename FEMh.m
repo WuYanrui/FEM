@@ -1,11 +1,12 @@
 %% Project #2
 % Authors: Blake Levy and Adedayo Lawal
+% Title: FEM Hz polarization
 clc;clear;
 tic
 %% set up constants from constants.m
 constants
 %% Set up geometry
-m = 200; % Number of elements
+m = 500; % Number of elements
 n = m+1; % Number of nodes
 L = 5*lamb0; % Length of slab is 5x free space wavelength
 x = 0:L/m:L; % discretize dielectric slab with N nodes
@@ -34,17 +35,10 @@ eta = zeros(length(theta),m);
 R(:,1) = -1;
 % Compute ETA_m 
 for i = 1:length(theta)
-    for j = 1:size(eta,2)
-        if j == size(eta,2)
-            eta(i,j) = (mur_slab*kx(i,j+1) - kx(i,j))...
-                /(mur_slab*kx(i,j+1) + kx(i,j));         
-        else
-            eta(i,j) = (kx(i,j+1) - kx(i,j))...
-                /(kx(i,j+1) + kx(i,j));   
-        end
-%         eta(i,j) = (mu_slab*kx(i,j) - mu_slab*kx(i,j-1))...
-%             /(mu_slab*kx(i,j) + mu_slab*kx(i,j-1));       
-    end
+    for j = 1:size(eta,2)       
+            eta(i,j) = (er_slab(j)*kx(i,j+1) - er_slab(j+1)*kx(i,j))...
+                /(er_slab(j)*kx(i,j+1) + er_slab(j+1)*kx(i,j));   
+    end    
 end
 % Compute R_m
 for i = 1:length(theta)
@@ -59,25 +53,25 @@ end
 
 
 reflection = zeros(1,length(theta));
-alpha_e = 1/mur_slab;
+alpha_e = 1./er_slab;
 
-E0 = 1;
+H0 = 1;
 phi = zeros(length(theta),length(theta));
 for T = 1:length(theta)
     %% Formation of the elemental K-matrix
     K_e = zeros(2,2);
     K = zeros(n,n); % This is a K-matrix for a SPECIFIED incidence angle    
     THETA = theta(T);    
-    beta_e = -(k0^2)*(er_slab - alpha_e*sin(THETA)^2);    
+    beta_e = -(k0^2)*(mur_slab - alpha_e*sin(THETA)^2);    
     for e = 1:m
     l_e = x(e+1)-x(e);
         % Fill elemental K-matrix
         for i = 1:2
             for j = 1:2
                 if i == j
-                    K_e(i,j) = alpha_e/l_e + beta_e(e)*l_e/3;
+                    K_e(i,j) = alpha_e(e)/l_e + beta_e(e)*l_e/3;
                 else
-                    K_e(i,j) = -alpha_e/l_e + beta_e(e)*l_e/6;
+                    K_e(i,j) = -alpha_e(e)/l_e + beta_e(e)*l_e/6;
                 end
             end
 
@@ -97,7 +91,7 @@ for T = 1:length(theta)
     K([2 end], 1) = 0;
     %% Formation of the global b
     % form the global b vector
-    q = 2*1j*k0*cos(THETA)*E0*exp(1j*k0*L*cos(THETA));
+    q = 2*1j*k0*cos(THETA)*H0*exp(1j*k0*L*cos(THETA));
     gamma = 1j*k0*cos(THETA);
     b = zeros(n,1);
     % add the boundary conditions at L to the b vector and K matrix
@@ -105,7 +99,7 @@ for T = 1:length(theta)
     b(end) = q;
     K(end,end) = K(end,end)+ gamma;
     phi(T,:) = K\b;
-    E_inc = E0*exp(1j*k0*L*cos(THETA));
+    E_inc = H0*exp(1j*k0*L*cos(THETA));
     reflection(T) = (phi(T,end) - E_inc)/conj(E_inc);
 end
 % Plot Analytical solution
