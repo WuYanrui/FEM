@@ -71,7 +71,7 @@ for k = 1:numel(phi)
     %% Compute numerical solution
     Ez = K\b;
     E_inc = E0*exp(1j*k0*L*cos(THETA));
-    reflection(k) = (Ez(end) - E_inc)/conj(E_inc);
+    Rn(k) = (Ez(end) - E_inc)/conj(E_inc);
 end
 %% Plot solution
 subplot(1,2,2)
@@ -80,12 +80,12 @@ xlabel('\theta (degrees)');
 ylabel('Reflection coefficient');
 legend({'Analytical'});
 subplot(1,2,1)
-plot(phi*180/pi,abs(reflection))
+plot(phi*180/pi,abs(Rn))
 xlabel('\theta (degrees)');
 ylabel('Reflection coefficient');
 legend({'Numerical'});
 figure
-plot(phi*180/pi,abs(R(:,end)),'-',phi*180/pi,abs(reflection),'--')
+plot(phi*180/pi,abs(R(:,end)),'-',phi*180/pi,abs(Rn),'--')
 xlabel('\theta (degrees)');
 ylabel('Reflection coefficient');
 s = sprintf('FEM, %d cells',M);
