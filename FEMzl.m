@@ -1,6 +1,6 @@
 %% Project #2
 % Authors: Blake Levy and Adedayo Lawal
-% Quadratic Elements & Gauss-Legendre quadrature
+% Cubic Elements & Gauss-Legendre quadrature
 clc;clear;
 close all;
 tic
@@ -9,9 +9,9 @@ constants
 
 %% Setup geometry
 M = 100; % Number of elements
-N = 2*M+1; % Number of nodes
+N = 3*M+1; % Number of nodes
 L = 5*lamb0; % Length of slab is 5x free space wavelength
-y = L/(N-1):2*L/(N-1):L-L/(N-1); % discretize dielectric slab with M elements
+y = 0:3*L/(N-1):L-3*L/(N-1); % discretize dielectric slab with M elements
 x = 0:L/(N-1):L; % discretize dielectric slab into N points
 phi = 0:pi/(2*M):pi/2;
 %% Analytical solution
@@ -29,7 +29,7 @@ R = zeros(length(phi),M+1);
 R(:,1) = -1;
 % compute R
 for i = 2:M+1
-    j = 2*(i-1)+1;
+    j = 3*(i-1)+1;
     R(:,i) = exp(2i*kx(:,i)*x(j)).*((eta(:,i-1) + R(:,i-1).*exp(-2i.*kx(:,i-1)*x(j))) ./ ...
              (1 + eta(:,i-1).*R(:,i-1).*exp(-2i*kx(:,i-1)*x(j))));
 end
@@ -43,22 +43,27 @@ for k = 1:numel(phi)
     K = zeros(N,N);
     alpha = 1/(2-0.1j);
     THETA = phi(k);
-    le = x(3)-x(1);
     beta = -(k0^2)*(e_r - alpha.*sin(THETA).^2);    
-    
     for i = 1:M
-        j = 2*i-1;
-        le = x(j+2)-x(j);
-        Ke = compute_ke_quad(alpha, beta(i), le); 
+        j = 3*(i-1)+1;
+        le = x(j+3)-x(j);
+        Ke = compute_ke_cubic(alpha, beta(i), le); 
         K(j,j) = K(j,j)+Ke(1,1);
         K(j,j+1) = Ke(1,2);
         K(j,j+2) = Ke(1,3);
+        K(j,j+3) = Ke(1,4);
         K(j+1,j) = K(j,j+1);
         K(j+1,j+1) = Ke(2,2);
         K(j+1,j+2) = Ke(2,3);
+        K(j+1,j+3) = Ke(2,4);
         K(j+2,j) = K(j,j+2);
         K(j+2,j+1) = K(j+1,j+2);
         K(j+2,j+2) = Ke(3,3);
+        K(j+2,j+3) = Ke(3,4);
+        K(j+3,j) = K(j,j+3);
+        K(j+3,j+1) = K(j+1,j+3);
+        K(j+3,j+2) = K(j+2,j+3);
+        K(j+3,j+3) = Ke(4,4);
     end
     
     % initialize the b vector
@@ -66,10 +71,11 @@ for k = 1:numel(phi)
     for i = 1:M
         j = 2*i-1;
         le = x(j+2)-x(j);
-        be = compute_be_quad(le,f(j:j+2));
+        be = compute_be_cubic(le,f(j:j+3));
         b(i) =  b(i) + be(1);
         b(i+1) = be(2);
         b(i+2) = be(3);
+        b(i+3) = be(4);
     end
     
     % apply boundary conditions
@@ -103,6 +109,6 @@ figure
 plot(phi*180/pi,abs(R(:,end)),'-',phi*180/pi,abs(Rn),'--')
 xlabel('\theta (degrees)');
 ylabel('Reflection coefficient');
-s = sprintf('FEM (Quadratic Elements), %d cells',M);
+s = sprintf('FEM (Cubic Elements), %d cells',M);
 legend({'Analytical',s});
 toc

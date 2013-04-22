@@ -1,7 +1,7 @@
 %% Project #2
 % Authors: Blake Levy and Adedayo Lawal
 % (Quadratic Elements) 
-%clc;clear;
+clc;clear;
 close all;
 tic
 %% set up constants from constants.m

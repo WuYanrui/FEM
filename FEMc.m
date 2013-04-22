@@ -1,7 +1,7 @@
 %% Project #2
 % Authors: Blake Levy and Adedayo Lawal
 % Vectorized approach
-%clc;clear;
+clc;clear;
 tic
 %% set up constants from constants.m
 constants
