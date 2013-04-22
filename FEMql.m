@@ -1,6 +1,6 @@
 %% Project #2
 % Authors: Blake Levy and Adedayo Lawal
-% (Quadratic Elements) 
+% Quadratic Elements & Gauss-Legendre quadrature
 %clc;clear;
 close all;
 tic
@@ -35,46 +35,44 @@ for i = 2:M+1
 end
 %% Numerical simulation
 Rn = zeros(1,length(phi));
+
 for k = 1:numel(phi)
     % initialize f
     f = zeros(N,1);
     % initialize the K matrix
     K = zeros(N,N);
-    alpha = 1./mu_r;
+    alpha = 1/(2-0.1j);
     THETA = phi(k);
-    beta = -(k0^2)*(e_r - alpha.*sin(THETA).^2);
     le = x(3)-x(1);
-    K(1,1) = alpha(1)*7/(3*le) + beta(1)*2*le/15;
-    K(1,2) = -alpha(1)*8/(3*le) + beta(1)*le/15;    
-    K(1,3) = alpha(1)/(3*le) - beta(1)*le/30;
-    K(2,1) = K(1,2);    
-    K(2,2) = alpha(1)*16/(3*le) + beta(1)*8*le/15;
-    K(2,3) = -alpha(1)*8/(3*le) + beta(1)*le/15;    
-    K(3,1) = K(1,3);
-    K(3,2) = K(2,3);
-    K(N,N) = alpha(M)*7/(3*le) + beta(M)*2*le/15;    
-    for i = 3:2:N-2
-        j = (i-1)/2+1;
-        le = x(2*j+1)-x(2*j-1);
-        K(i,i) = alpha(j)*7/(3*le) + beta(j)*2*le/15 + alpha(j-1)*7/(3*le) + beta(j-1)*2*le/15;
-        K(i,i+1) =  -alpha(j)*8/(3*le) + beta(j)*le/15;
-        K(i,i+2) = alpha(j)/(3*le) - beta(j)*le/30;
-        K(i+1,i) =  K(i,i+1);
-        K(i+1,i+1) = alpha(j)*16/(3*le) + beta(j)*8*le/15; 
-        K(i+1,i+2) = -alpha(1)*8/(3*le) + beta(1)*le/15; 
-        K(i+2,i) = K(i,i+2);
-        K(i+2,i+1) = K(i+1,i+2);
+    beta = -(k0^2)*(e_r - alpha.*sin(THETA).^2);    
+    
+    for i = 1:M
+        j = 2*i-1;
+        le = x(j+2)-x(j);
+        Ke = compute_ke_quad(alpha, beta(i), le); 
+        K(j,j) = K(j,j)+Ke(1,1);
+        K(j,j+1) = Ke(1,2);
+        K(j,j+2) = Ke(1,3);
+        K(j+1,j) = K(j,j+1);
+        K(j+1,j+1) = Ke(2,2);
+        K(j+1,j+2) = Ke(2,3);
+        K(j+2,j) = K(j,j+2);
+        K(j+2,j+1) = K(j+1,j+2);
+        K(j+2,j+2) = Ke(3,3);
     end
+    
     % initialize the b vector
     b = zeros(N,1);
-    b(1) = f(1)*le/6;
-    b(2) = f(1)*2*le/3;
-    b(N) = f(M)*le/6;
-    for i =  3:2:N-2
-        j = (i-1)/2+1;
-        b(i) = f(j-1)*le/6 + f(j)*le/6;
-        b(i+1) = f(j)*2*le/3;
+    be = compute_be_quad(le,f(1:3));
+    for i = 1:M
+        j = 2*i-1;
+        le = x(j+2)-x(j);
+        be = compute_be_quad(le,f(j:j+2));
+        b(i) =  b(i) + be(1);
+        b(i+1) = be(2);
+        b(i+2) = be(3);
     end
+    
     % apply boundary conditions
     K(1,1) = 1;
     K(1,2:end) = 0;
@@ -84,10 +82,12 @@ for k = 1:numel(phi)
     gamma = 1j*k0*cos(THETA);
     K(N,N) = K(N,N) + gamma;
     b(N) = b(N) + q;
-    %% Compute numerical solution
+    
+    % Compute numerical solution
     Ez = K\b;
     E_inc = E0*exp(1j*k0*L*cos(THETA));
     Rn(k) = (Ez(end) - E_inc)/conj(E_inc);
+    
 end
 %% Plot solution
 subplot(1,2,2)
