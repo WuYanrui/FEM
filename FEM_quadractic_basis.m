@@ -5,7 +5,7 @@ tic
 %% set up constants from constants.m
 constants
 %% Set up geometry
-m = 100; % Number of elements
+m = 50; % Number of elements
 n = m+1; % Number of nodes
 Q = m+2;
 L = 5*lamb0; % Length of slab is 5x free space wavelength
