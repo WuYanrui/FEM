@@ -5,7 +5,7 @@ tic
 %% set up constants from constants.m
 constants
 %% Set up geometry
-m = 50; % Number of elements
+m = 200; % Number of elements
 n = m+1; % Number of nodes
 Q = m+2;
 L = 5*lamb0; % Length of slab is 5x free space wavelength
@@ -73,7 +73,7 @@ for T = 1:length(theta)
         l_e = x(2*e+1)-x(2*e-1);
             % Fill elemental K-matrix
         K_e(1,1) = alpha_e*7/(3*l_e) + beta_e(e)*2*l_e/15;
-        K_e(1,2) = -alpha_e*8/(3*l_e) + beta_e(e)*2*l_e/15;
+        K_e(1,2) = -alpha_e*8/(3*l_e) + beta_e(e)*l_e/15;
         K_e(1,3) = alpha_e/(3*l_e) - beta_e(e)*l_e/30;    
         K_e(2,2) = alpha_e*16/(3*l_e) + beta_e(e)*8*l_e/15;
         K_e(2,1) = K_e(1,2);   
