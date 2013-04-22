@@ -5,7 +5,7 @@ tic
 %% set up constants from constants.m
 constants
 %% Set up geometry
-m = 200; % Number of elements
+m = 100; % Number of elements
 n = m+1; % Number of nodes
 L = 5*lamb0; % Length of slab is 5x free space wavelength
 x = 0:L/m:L; % discretize dielectric slab with N nodes
@@ -101,5 +101,6 @@ plot(degree, 10*log10(abs(diff)));
 title('Error (Difference) (dB) as function of Theta');
 xlabel('Theta (\theta)');
 ylabel('Error (dB)');
+save('linear.mat','degree','R','reflection');
 toc
 

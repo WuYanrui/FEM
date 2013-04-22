@@ -111,4 +111,5 @@ xlabel('\theta (degrees)');
 ylabel('Reflection coefficient');
 s = sprintf('FEM (Cubic Elements), %d cells',M);
 legend({'Analytical',s});
+save('cube.mat','phi','R','Rn');
 toc

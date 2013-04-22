@@ -105,4 +105,10 @@ xlabel('\theta (degrees)');
 ylabel('Reflection coefficient');
 s = sprintf('FEM (Quadratic Elements), %d cells',M);
 legend({'Analytical',s});
+save('quad.mat','phi','R','Rn');
+Rn_cube = load('cube.mat','Rn');
+Rn_linear = load('linear.mat','reflection');
+figure(3)
+plot(phi*180/pi,abs(R(:,end)),'k--',phi*180/pi,abs(Rn),'b',...
+    phi*180/pi,abs(Rn_cube.Rn),'g',phi*180/pi,abs(Rn_linear.reflection),'r');
 toc

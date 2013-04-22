@@ -13,7 +13,7 @@ phi = 0:pi/(2*M):pi/2;
 %% Analytical solution
 mu_r = ones(1,length(x));
 mu_r(1:end-1) = 2-0.1j;
-e_r = 4+(2-0.1j)*((1-y/L).^2);
+e_r = 4+(2-0.1j)*((1-y/L).^2); %*ones(1,length(y));
 e_r = padarray(e_r, [0 1],1,'post'); % pad array with '1' for free space
 %plot(1:n,abs(e_r));
 % compute kx
