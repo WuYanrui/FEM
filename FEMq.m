@@ -61,7 +61,7 @@ for k = 1:numel(phi)
         K(i,i+2) = alpha(j)/(3*le) - beta(j)*le/30;
         K(i+1,i) =  K(i,i+1);
         K(i+1,i+1) = alpha(j)*16/(3*le) + beta(j)*8*le/15; 
-        K(i+1,i+2) = -alpha(1)*8/(3*le) + beta(1)*le/15; 
+        K(i+1,i+2) = -alpha(j)*8/(3*le) + beta(j)*le/15; 
         K(i+2,i) = K(i,i+2);
         K(i+2,i+1) = K(i+1,i+2);
     end
