@@ -29,38 +29,9 @@ for i = 1:length(theta)
     end
 end
 %% FEM
-R = zeros(length(theta),n);
-eta = zeros(length(theta),m);
-R(:,1) = -1;
-% Compute ETA_m 
-for i = 1:length(theta)
-    for j = 1:size(eta,2)
-        if j == size(eta,2)
-            eta(i,j) = (mur_slab*kx(i,j+1) - kx(i,j))...
-                /(mur_slab*kx(i,j+1) + kx(i,j));         
-        else
-            eta(i,j) = (kx(i,j+1) - kx(i,j))...
-                /(kx(i,j+1) + kx(i,j));   
-        end
-%         eta(i,j) = (mu_slab*kx(i,j) - mu_slab*kx(i,j-1))...
-%             /(mu_slab*kx(i,j) + mu_slab*kx(i,j-1));       
-    end
-end
-% Compute R_m
-for i = 1:length(theta)
-    for j = 1:size(eta,2)
-        
-           R(i,j+1) = exp(2*1j*kx(i,j+1)*x(j+1))*...
-            ((eta(i,j) + R(i,j)*exp(-2*1j*kx(i,j)*x(j+1)))...
-            /(1+(eta(i,j)*R(i,j)*exp(-2*1j*kx(i,j)*x(j+1)))));     
-        
-    end
-end
-
-
+R = compute_analytic(m);
 reflection = zeros(1,length(theta));
 alpha_e = 1/mur_slab;
-
 E0 = 1;
 phi = zeros(length(theta),length(theta));
 for T = 1:length(theta)
