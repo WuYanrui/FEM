@@ -89,17 +89,10 @@ for k = 1:numel(phi)
     
 end
 %% Error result
-% mu_slab = mu_r*mu0;
-% e_slab = e_r*eps0;
-% y_exact = 0:L/(M):L;
-% Z_exact = zeros(length(phi),length(kx));
-% R_exact = zeros(length(phI),length(kx));
-% for i = 1:length(phi);
-%     Z_exact(i,:) = j*sqrt(mu_slab./e_slab).*tan(kx(:,i).*y_exact);
-%     R_exact = (Z_exact - sqrt(mu0/eps0))./(Z_exact + sqrt(mu0/eps0));
-% end
-Z_in = j*sqrt(mu0/4/eps0)*tan(w*sqrt(4)*x/c);
+ks = k0*sqrt(4);
+Z_in = j*sqrt(mu0/4/eps0)*tan(k0*sqrt(4)*x);
 R_exact = (Z_in - sqrt(mu0/eps0))./(Z_in + sqrt(mu0/eps0));
-error = abs((Rn-transpose(R_exact)));
-semilogy(x/lamb0,error)
+Ez_exact = (1+R_exact(end))*exp(-1j*sqrt(4)*k0.*x);
+error = abs(Ez-transpose(Ez_exact));
+semilogy(x(2:end)/lamb0,error(2:end))
 toc
