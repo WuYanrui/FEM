@@ -8,11 +8,11 @@ tic
 constants
 
 %% Setup geometry
-M = 100; % Number of elements
+M = 99; % Number of elements
 N = 2*M+1; % Number of nodes
 L = 5*lamb0; % Length of slab is 5x free space wavelength
 y = L/(N-1):2*L/(N-1):L-L/(N-1); % discretize dielectric slab with M elements
-x = 0:L/(N-1):L; % discretize dielectric slab into N points
+x_q = 0:L/(N-1):L; % discretize dielectric slab into N points
 phi = 0;%:pi/(2*M):pi/2;
 %% Analytical solution
 e_r = 4*ones(1,length(y));%+(2-0.1j)*((1-y/L).^2);
@@ -30,8 +30,8 @@ R(:,1) = -1;
 % compute R
 for i = 2:M+1
     j = 2*(i-1)+1;
-    R(:,i) = exp(2i*kx(:,i)*x(j)).*((eta(:,i-1) + R(:,i-1).*exp(-2i.*kx(:,i-1)*x(j))) ./ ...
-             (1 + eta(:,i-1).*R(:,i-1).*exp(-2i*kx(:,i-1)*x(j))));
+    R(:,i) = exp(2i*kx(:,i)*x_q(j)).*((eta(:,i-1) + R(:,i-1).*exp(-2i.*kx(:,i-1)*x_q(j))) ./ ...
+             (1 + eta(:,i-1).*R(:,i-1).*exp(-2i*kx(:,i-1)*x_q(j))));
 end
 %% Numerical simulation
 Rn = zeros(1,N);
@@ -43,12 +43,12 @@ for k = 1:numel(phi)
     K = zeros(N,N);
     alpha = 1/(2-0.1j);
     THETA = phi(k);
-    le = x(3)-x(1);
+    le = x_q(3)-x_q(1);
     beta = -(k0^2)*(e_r - alpha.*sin(THETA).^2);    
     
     for i = 1:M
         j = 2*i-1;
-        le = x(j+2)-x(j);
+        le = x_q(j+2)-x_q(j);
         Ke = compute_ke_quad(alpha, beta(i), le); 
         K(j,j) = K(j,j)+Ke(1,1);
         K(j,j+1) = Ke(1,2);
@@ -65,7 +65,7 @@ for k = 1:numel(phi)
     b = zeros(N,1);
     for i = 1:M
         j = 2*i-1;
-        le = x(j+2)-x(j);
+        le = x_q(j+2)-x_q(j);
         be = compute_be_quad(le,f(j:j+2));
         b(i) =  b(i) + be(1);
         b(i+1) = be(2);
@@ -90,9 +90,10 @@ for k = 1:numel(phi)
 end
 %% Error result
 ks = k0*sqrt(4);
-Z_in = j*sqrt(mu0/4/eps0)*tan(k0*sqrt(4)*x);
+Z_in = j*sqrt(mu0/4/eps0)*tan(k0*sqrt(4)*x_q);
 R_exact = (Z_in - sqrt(mu0/eps0))./(Z_in + sqrt(mu0/eps0));
-Ez_exact = (1+R_exact(end))*exp(-1j*sqrt(4)*k0.*x);
-error = abs(Ez-transpose(Ez_exact));
-semilogy(x(2:end)/lamb0,error(2:end))
+Ez_exact = (1+R_exact(end))*exp(-1j*sqrt(4)*k0.*x_q);
+error_q = abs(Ez-transpose(Ez_exact));
+semilogy(x_q(2:end)/lamb0,error_q(2:end))
+save('error.mat','error_q','x_q','-append');
 toc

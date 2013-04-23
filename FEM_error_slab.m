@@ -5,10 +5,10 @@ tic
 %% set up constants from constants.m
 constants
 %% Set up geometry
-m = 200; % Number of elements
+m = 99; % Number of elements
 n = m+1; % Number of nodes
 L = 5*lamb0; % Length of slab is 5x free space wavelength
-x = 0:L/m:L; % discretize dielectric slab with N nodes
+x_L = 0:L/m:L; % discretize dielectric slab with N nodes
 y = 0:L/(m-1):L; % discretize dielectric slab with M elements
 theta = 0:pi/(2*m):pi/2; % incident angle range from 0 to 90 degrees
 degree = theta*180/pi;
@@ -41,7 +41,7 @@ for T = 1:length(theta)
     THETA = theta(T);    
     beta_e = -(k0^2)*(er_slab - alpha_e*sin(THETA)^2);    
     for e = 1:m
-    l_e = x(e+1)-x(e);
+    l_e = x_L(e+1)-x_L(e);
         % Fill elemental K-matrix
         for i = 1:2
             for j = 1:2
@@ -80,27 +80,12 @@ for T = 1:length(theta)
     reflection(T) = (phi(T,end) - E_inc)/conj(E_inc);
 end
 % Plot Analytical solution
-
-% subplot(1,2,1)
-% plot(padarray(y,[0 1],L+L/m,'post')/L,abs(e_slab)); title('Permitivity profile in slab');
-% ylabel('permitivity');xlabel('distance from PEC (x/L)');
-% subplot(1,2,2)
-
-
-
-
-% figure(1)
-subplot(1,2,1)
-% Plot Analytic AND simulated results as a function of theta
-plot(degree,abs(R(:,end)),'k',degree,abs(reflection),'k--')
-legend('Analytical','simulated')
-% Calculate Error (or difference)
-diff = R(:,end) - transpose(reflection);
-subplot(1,2,2)
-plot(degree, 10*log10(abs(diff)));
-title('Error (Difference) (dB) as function of Theta');
-xlabel('Theta (\theta)');
-ylabel('Error (dB)');
-save('linear.mat','degree','R','reflection');
+ks = k0*sqrt(4);
+Z_in = j*sqrt(mu0/4/eps0)*tan(k0*sqrt(4)*x_L);
+R_exact = (Z_in - sqrt(mu0/eps0))./(Z_in + sqrt(mu0/eps0));
+Ez_exact = (1+R_exact(end))*exp(-1j*sqrt(4)*k0.*x_L);
+error_L = abs(phi(1,:)-Ez_exact);
+semilogy(x_L(2:end)/lamb0,error_L(2:end))
+save('error.mat','error_L','x_L');
 toc
 
