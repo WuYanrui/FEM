@@ -8,7 +8,7 @@ tic
 constants
 
 %% Setup geometry
-M = 200; % Number of elements
+M = 500; % Number of elements
 N = 2*M+1; % Number of nodes
 L = 5*lamb0; % Length of slab is 5x free space wavelength
 y = L/(N-1):2*L/(N-1):L-L/(N-1); % discretize dielectric slab with M elements

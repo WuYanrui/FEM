@@ -5,7 +5,7 @@ tic
 %% set up constants from constants.m
 constants
 %% Set up geometry
-m = 200; % Number of elements
+m = 500; % Number of elements
 n = m+1; % Number of nodes
 L = 5*lamb0; % Length of slab is 5x free space wavelength
 x = 0:L/m:L; % discretize dielectric slab with N nodes
