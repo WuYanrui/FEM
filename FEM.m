@@ -92,7 +92,7 @@ end
 % figure(1)
 subplot(1,2,1)
 % Plot Analytic AND simulated results as a function of theta
-plot(degree,abs(R(:,end)),'k',degree,abs(reflection),'k--')
+plot(degree,real(R(:,end)),'k',degree,real(reflection),'k--')
 legend('Analytical','simulated')
 % Calculate Error (or difference)
 diff = R(:,end) - transpose(reflection);
